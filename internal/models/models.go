@@ -22,5 +22,4 @@ func ReturnedUser(d database.User) User {
 		Email : d.Email,
 		CreatedAt: d.CreatedAt,
 	}
-
 }

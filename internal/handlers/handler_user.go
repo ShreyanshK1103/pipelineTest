@@ -27,14 +27,18 @@ func (cfg *Config) HandlerCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	email := params.Email
 
-	hashedPassword := bcrypt.GenerateFromPassword(params.Password, 12)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(params.Password), 12)
+	if err != nil {
+		respondWithError(w, 400, fmt.Sprintf("There is an while encrypting the password %v ", err))
+	}
+
 
 	user, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Email: email,
-		Password: hashedPassword,
+		Password: string(hashedPassword),
 	})
 	if err != nil {
-		respondWithError(w, 400, fmt.Sprintf("Unable to create the password"))
+		respondWithError(w, 400, fmt.Sprintf("Unable to create the password: %v", err))
 		return
 	}
 
