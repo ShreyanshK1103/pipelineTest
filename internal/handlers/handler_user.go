@@ -87,13 +87,19 @@ func (cfg *Config) HandlerLoginUser(w http.ResponseWriter, r *http.Request) {
 	token, err := auth.MakeJWT(user.ID, secret, time.Hour)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Could not create token")
+		return
 	}
 
-	respondWithJSON(w, http.StatusOK, struct {
-		models.User
-		Token string `json:"token"`
-	}{
-		User: models.ReturnedUser(user),
-		Token: token,
+	http.SetCookie(w, &http.Cookie{
+		Name: "jwt",
+		Value : token,
+		Path: "/",
+		MaxAge: 3600,
+		HttpOnly: true,
+		Secure: true,
+		SameSite: http.SameSiteLaxMode, 
 	})
+	
+	respondWithJSON(w, http.StatusOK, models.ReturnedUser(user))
+	
 }
