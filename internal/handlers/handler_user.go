@@ -103,3 +103,14 @@ func (cfg *Config) HandlerLoginUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, models.ReturnedUser(user))
 	
 }
+
+func (cfg *Config) HandlerLogout(w http.ResponseWriter, r *http.Request) {
+    http.SetCookie(w, &http.Cookie{
+        Name:     "jwt",
+        Value:    "",
+        Path:     "/",
+        MaxAge:   -1, // Tells the browser to delete it immediately
+        HttpOnly: true,
+    })
+    w.WriteHeader(http.StatusNoContent)
+}
